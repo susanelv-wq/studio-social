@@ -1,8 +1,9 @@
 'use client'
 
+import { format } from 'date-fns'
 import { ReelItem, BrandSettings, Task } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, Calendar } from 'lucide-react'
 import { useState } from 'react'
 import ReelDetailDrawer from './ReelDetailDrawer'
 
@@ -100,6 +101,12 @@ export default function ReelCard({
           <div>
             <h3 className="font-bold text-foreground">{item.title}</h3>
             <p className="text-sm text-muted-foreground">{item.hook}</p>
+            {item.scheduledAt && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Calendar className="w-3 h-3" />
+                Post: {format(new Date(item.scheduledAt + 'T12:00:00'), 'MMM d, yyyy')}
+              </p>
+            )}
           </div>
 
           {/* Beats */}

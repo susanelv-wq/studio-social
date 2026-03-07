@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { format } from 'date-fns'
 import { FeedItem, BrandSettings } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import FeedDetailDrawer from './FeedDetailDrawer'
-import { Edit2 } from 'lucide-react'
+import { Edit2, Calendar } from 'lucide-react'
 
 interface FeedCardProps {
   item: FeedItem
@@ -61,6 +62,12 @@ export default function FeedCard({
         </div>
 
         <div className="space-y-2">
+          {item.scheduledAt && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              Post: {format(new Date(item.scheduledAt + 'T12:00:00'), 'MMM d, yyyy')}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground line-clamp-2">
             {item.caption}
           </p>

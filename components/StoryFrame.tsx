@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Copy, Check, Upload, Sparkles } from 'lucide-react'
 import { useGenerateImage } from '@/hooks/use-generate-image'
 import { buildStoryBackgroundPrompt } from '@/lib/image-prompt'
+import { ScheduleDatePicker } from '@/components/ScheduleDatePicker'
 
 interface StoryFrameProps {
   frame: StoryFrameType
@@ -156,6 +157,16 @@ export default function StoryFrame({
               className="hidden"
             />
           </label>
+        )}
+        {onItemUpdate && (
+          <div className="mt-2">
+            <ScheduleDatePicker
+              value={frame.scheduledAt}
+              onChange={d => onItemUpdate({ ...frame, scheduledAt: d })}
+              placeholder="Date to post"
+              className="h-8 text-xs"
+            />
+          </div>
         )}
       </div>
     </div>

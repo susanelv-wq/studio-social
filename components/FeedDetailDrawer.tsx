@@ -14,6 +14,7 @@ import {
 import { Copy, Check, Upload, Sparkles } from 'lucide-react'
 import { useGenerateImage } from '@/hooks/use-generate-image'
 import { buildFeedImagePrompt } from '@/lib/image-prompt'
+import { ScheduleDatePicker } from '@/components/ScheduleDatePicker'
 
 interface FeedDetailDrawerProps {
   item: FeedItem
@@ -258,6 +259,18 @@ export default function FeedDetailDrawer({
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Schedule post */}
+          <div>
+            <label className="text-sm font-medium text-foreground block mb-2">
+              Date to post
+            </label>
+            <ScheduleDatePicker
+              value={formData.scheduledAt}
+              onChange={d => handleChange('scheduledAt', d)}
+              placeholder="Pick date to post"
+            />
           </div>
 
           {/* Other fields */}
