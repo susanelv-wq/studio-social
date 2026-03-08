@@ -79,11 +79,17 @@ OPENAI_API_KEY=sk-your-openai-key
 
 Save (Ctrl+O, Enter, Ctrl+X).
 
-Install dependencies and build:
+Install dependencies (include dev – the build needs Tailwind/PostCSS/TypeScript):
 
 ```bash
-npm ci --omit=dev
+npm ci
 npm run build
+```
+
+Optional: remove dev dependencies after build to save disk (then only `next start` runs):
+
+```bash
+npm prune --production
 ```
 
 Start on port 3002 with PM2:
@@ -174,7 +180,7 @@ On VPS:
 
 ```bash
 cd /www/wwwroot/studio-social
-npm ci --omit=dev
+npm ci
 npm run build
 pm2 restart studio-social
 ```
@@ -184,7 +190,7 @@ If you use Git on the server:
 ```bash
 cd /www/wwwroot/studio-social
 git pull
-npm ci --omit=dev
+npm ci
 npm run build
 pm2 restart studio-social
 ```
