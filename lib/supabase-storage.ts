@@ -3,7 +3,7 @@ import { createClient } from './supabase/client'
 
 const CLIENT_ID_KEY = 'supabase-client-id'
 
-function getClientId(): string {
+function getAnonymousId(): string {
   if (typeof window === 'undefined') return ''
   try {
     let id = localStorage.getItem(CLIENT_ID_KEY)
@@ -17,11 +17,19 @@ function getClientId(): string {
   }
 }
 
+/** When signed in: use user id so projects are per-user. When signed out: use anonymous id (per device). */
+async function getStorageId(): Promise<string> {
+  const supabase = createClient()
+  if (!supabase) return getAnonymousId()
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.user?.id ?? getAnonymousId()
+}
+
 export async function loadProjects(): Promise<Project[]> {
   const supabase = createClient()
   if (!supabase) return []
 
-  const clientId = getClientId()
+  const clientId = await getStorageId()
   if (!clientId) return []
 
   const { data, error } = await supabase
@@ -31,8 +39,9 @@ export async function loadProjects(): Promise<Project[]> {
     .order('updated_at', { ascending: false })
 
   if (error) {
-    console.error('Supabase loadProjects error:', error)
-    return []
+    const msg = error?.message ?? (error as { code?: string })?.code ?? JSON.stringify(error)
+    console.warn('Supabase loadProjects failed (using localStorage fallback):', msg)
+    throw error
   }
 
   return (data ?? []).map((row) => row.data as Project)
@@ -42,7 +51,7 @@ export async function saveProjects(projects: Project[]): Promise<void> {
   const supabase = createClient()
   if (!supabase) return
 
-  const clientId = getClientId()
+  const clientId = await getStorageId()
   if (!clientId) return
 
   const rows = projects.map((p) => ({
@@ -60,6 +69,8 @@ export async function saveProjects(projects: Project[]): Promise<void> {
   })
 
   if (error) {
-    console.error('Supabase saveProjects error:', error)
+    const msg = error?.message ?? (error as { code?: string })?.code ?? JSON.stringify(error)
+    console.warn('Supabase saveProjects failed (using localStorage fallback):', msg)
+    throw error
   }
 }

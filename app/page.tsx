@@ -3,22 +3,26 @@
 import { useState, useEffect } from 'react'
 import { Project } from '@/lib/types'
 import { getInitialState, saveProjects, saveCurrentProjectId } from '@/lib/storage'
+import { useAuth } from '@/contexts/AuthContext'
 import ProjectSidebar from '@/components/ProjectSidebar'
 import MainCanvas from '@/components/MainCanvas'
+import AuthUI from '@/components/AuthUI'
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([])
   const [currentProjectId, setCurrentProjectId] = useState<string>('')
   const [isLoaded, setIsLoaded] = useState(false)
+  const { user, loading: authLoading } = useAuth()
 
-  // Load initial state from Supabase or localStorage
+  // Load projects when auth is ready or user changes (signed in/out = different project list)
   useEffect(() => {
+    if (authLoading) return
     getInitialState().then((state) => {
       setProjects(state.projects)
       setCurrentProjectId(state.currentProjectId)
       setIsLoaded(true)
     })
-  }, [])
+  }, [authLoading, user?.id])
 
   // Save projects to Supabase or localStorage whenever they change
   useEffect(() => {
@@ -47,7 +51,12 @@ export default function Home() {
   }
 
   return (
-    <main className="flex w-full h-screen bg-background">
+    <main className="flex flex-col w-full h-screen bg-background">
+      {/* Top bar: Sign in / Sign up / Log out */}
+      <header className="flex items-center justify-end gap-2 px-4 py-2 border-b border-border bg-card shrink-0">
+        <AuthUI />
+      </header>
+      <div className="flex flex-1 overflow-hidden">
       {/* Left Sidebar */}
       <ProjectSidebar
         projects={projects}
@@ -62,6 +71,7 @@ export default function Home() {
           setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p))
         }} />
       )}
+      </div>
     </main>
   )
 }

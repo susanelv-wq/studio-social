@@ -26,19 +26,27 @@ function loadProjectsLocal(): Project[] {
   }
 }
 
-/** Persist projects to Supabase (if configured) or localStorage. */
+/** Persist projects to Supabase (if configured) or localStorage. Falls back to localStorage if Supabase fails. */
 export async function saveProjects(projects: Project[]): Promise<void> {
   if (isSupabaseConfigured()) {
-    await supabaseStorage.saveProjects(projects)
+    try {
+      await supabaseStorage.saveProjects(projects)
+    } catch {
+      saveProjectsLocal(projects)
+    }
   } else {
     saveProjectsLocal(projects)
   }
 }
 
-/** Load projects from Supabase (if configured) or localStorage. */
+/** Load projects from Supabase (if configured) or localStorage. Falls back to localStorage if Supabase fails (e.g. table not created). */
 export async function loadProjects(): Promise<Project[]> {
   if (isSupabaseConfigured()) {
-    return supabaseStorage.loadProjects()
+    try {
+      return await supabaseStorage.loadProjects()
+    } catch {
+      return loadProjectsLocal()
+    }
   }
   return loadProjectsLocal()
 }
