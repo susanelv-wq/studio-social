@@ -4,19 +4,34 @@ import { useState, useCallback } from 'react'
 
 export type ImageSize = 'square' | 'portrait' | 'landscape'
 
+export interface GenerateImageOptions {
+  size?: ImageSize
+  /** Canva-style: use GPT to refine the prompt for better DALL·E 3 results */
+  enhance?: boolean
+}
+
 export function useGenerateImage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const generate = useCallback(
-    async (prompt: string, size: ImageSize = 'square'): Promise<string | null> => {
+    async (
+      prompt: string,
+      size: ImageSize = 'square',
+      options: GenerateImageOptions = {}
+    ): Promise<string | null> => {
+      const finalSize = options.size ?? size
       setLoading(true)
       setError(null)
       try {
         const res = await fetch('/api/generate-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, size })
+          body: JSON.stringify({
+            prompt,
+            size: finalSize,
+            enhance: options.enhance ?? true,
+          }),
         })
         const data = await res.json()
         if (!res.ok) {

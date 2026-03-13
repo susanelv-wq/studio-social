@@ -13,8 +13,19 @@ import {
 } from '@/components/ui/sheet'
 import { Copy, Check, Upload, Sparkles } from 'lucide-react'
 import { useGenerateImage } from '@/hooks/use-generate-image'
-import { buildReelCoverPrompt } from '@/lib/image-prompt'
+import {
+  buildReelCoverPrompt,
+  type ImageStyle,
+  IMAGE_STYLE_LABELS,
+} from '@/lib/image-prompt'
 import { ScheduleDatePicker } from '@/components/ScheduleDatePicker'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ReelDetailDrawerProps {
   item: ReelItem
@@ -31,13 +42,15 @@ export default function ReelDetailDrawer({
 }: ReelDetailDrawerProps) {
   const [formData, setFormData] = useState(item)
   const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [coverStyle, setCoverStyle] = useState<ImageStyle>('bold')
   const { generate, loading, error } = useGenerateImage()
 
   const handleGenerateCover = async () => {
     const prompt = buildReelCoverPrompt(
       formData.title,
       formData.coverHeadline,
-      formData.hook
+      formData.hook,
+      coverStyle
     )
     const imageUrl = await generate(prompt, 'portrait')
     if (imageUrl) handleChange('coverImageUrl', imageUrl)
@@ -83,6 +96,21 @@ export default function ReelDetailDrawer({
             <label className="text-sm font-medium text-foreground block mb-2">
               Cover Image
             </label>
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              <span className="text-xs text-muted-foreground">Style:</span>
+              <Select value={coverStyle} onValueChange={(v) => setCoverStyle(v as ImageStyle)}>
+                <SelectTrigger className="w-[180px] h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {IMAGE_STYLE_LABELS[s]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             {formData.coverImageUrl && (
               <div className="mb-3 rounded-lg overflow-hidden border border-border">
                 <img

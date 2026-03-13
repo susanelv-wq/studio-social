@@ -13,8 +13,19 @@ import {
 } from '@/components/ui/sheet'
 import { Copy, Check, Upload, Sparkles } from 'lucide-react'
 import { useGenerateImage } from '@/hooks/use-generate-image'
-import { buildFeedImagePrompt } from '@/lib/image-prompt'
+import {
+  buildFeedImagePrompt,
+  type ImageStyle,
+  IMAGE_STYLE_LABELS,
+} from '@/lib/image-prompt'
 import { ScheduleDatePicker } from '@/components/ScheduleDatePicker'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface FeedDetailDrawerProps {
   item: FeedItem
@@ -31,6 +42,7 @@ export default function FeedDetailDrawer({
 }: FeedDetailDrawerProps) {
   const [formData, setFormData] = useState(item)
   const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [imageStyle, setImageStyle] = useState<ImageStyle>('photorealistic')
   const { generate, loading, error } = useGenerateImage()
 
   const handleGenerateImage = async () => {
@@ -38,7 +50,8 @@ export default function FeedDetailDrawer({
       formData.headline,
       formData.subheadline,
       formData.visualStyle,
-      formData.imagePrompt
+      formData.imagePrompt,
+      imageStyle
     )
     const imageUrl = await generate(prompt, 'square')
     if (imageUrl) handleChange('imageUrl', imageUrl)
@@ -90,16 +103,31 @@ export default function FeedDetailDrawer({
             <label className="text-sm font-medium text-foreground block mb-2">
               Image
             </label>
-            <div className="mb-3">
-              <label className="text-xs text-muted-foreground block mb-1">
-                What should the image show? (optional – e.g. &quot;boss babe working at laptop&quot;)
+            <div className="mb-3 space-y-2">
+              <label className="text-xs text-muted-foreground block">
+                What should the image show? (optional)
               </label>
               <Input
                 value={formData.imagePrompt ?? ''}
                 onChange={e => handleChange('imagePrompt', e.target.value || undefined)}
-                placeholder="e.g. boss babe working at laptop, confident woman in office"
+                placeholder="e.g. boss babe at laptop, cozy café flat lay"
                 className="bg-input text-sm"
               />
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground">Style:</span>
+                <Select value={imageStyle} onValueChange={(v) => setImageStyle(v as ImageStyle)}>
+                  <SelectTrigger className="w-[180px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {IMAGE_STYLE_LABELS[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             {formData.imageUrl && (
               <div className="mb-3 rounded-lg overflow-hidden border border-border">
