@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Project } from '@/lib/types'
 import { getInitialState, saveProjects, saveCurrentProjectId } from '@/lib/storage'
 import { isSupabaseConfigured } from '@/lib/supabase/client'
@@ -15,12 +15,15 @@ export default function Home() {
   const [currentProjectId, setCurrentProjectId] = useState<string>('')
   const [isLoaded, setIsLoaded] = useState(false)
   const { user, loading: authLoading } = useAuth()
+  const lastLoadedUserIdRef = useRef<string | null | undefined>(undefined)
 
   const userId = user?.id ?? null
 
-  // Load projects (from Supabase when signed in, else localStorage)
+  // Load projects once per user (so renames/edits are never overwritten by a duplicate load)
   useEffect(() => {
     if (authLoading) return
+    if (lastLoadedUserIdRef.current === userId) return
+    lastLoadedUserIdRef.current = userId
     getInitialState(userId).then((state) => {
       setProjects(state.projects)
       setCurrentProjectId(state.currentProjectId)
@@ -28,12 +31,12 @@ export default function Home() {
     })
   }, [authLoading, userId])
 
-  // Save projects whenever they change (debounced)
+  // Save projects whenever they change (debounced; renames persist quickly)
   useEffect(() => {
     if (!isLoaded || projects.length === 0) return
     const t = setTimeout(() => {
       saveProjects(projects, userId)
-    }, 400)
+    }, 200)
     return () => clearTimeout(t)
   }, [projects, isLoaded, userId])
 
@@ -46,6 +49,12 @@ export default function Home() {
 
   const currentProject = projects.find(p => p.id === currentProjectId)
   const showAuthLanding = isSupabaseConfigured() && !authLoading && !user
+
+  // Sidebar list changes (rename, add, delete): update state and persist immediately
+  const handleProjectsChange = (next: Project[]) => {
+    setProjects(next)
+    if (isLoaded && next.length > 0) saveProjects(next, userId)
+  }
 
   // When Supabase auth is configured and user is not signed in: show sign-in/sign-up only
   if (showAuthLanding) {
@@ -70,7 +79,7 @@ export default function Home() {
           projects={projects}
           currentProjectId={currentProjectId}
           onProjectSelect={setCurrentProjectId}
-          onProjectsChange={setProjects}
+          onProjectsChange={handleProjectsChange}
         />
         {currentProject && (
           <MainCanvas project={currentProject} onProjectChange={(updatedProject) => {
