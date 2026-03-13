@@ -1,15 +1,21 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/contexts/AuthContext'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
+const cormorant = Cormorant_Garamond({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'Social Mockup Studio | Create & Plan Social Content',
-  description: 'Generate social media mockups from text prompts. Plan feeds, reels, stories, and tasks with visual brand settings.',
+  title: 'SS | Create & Plan Social Content',
+  description: 'Plan feeds, reels, stories, and tasks. Create social content with SS.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -37,7 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <head>
+        <meta name="theme-color" content="#d64d7b" />
+      </head>
+      <body className={`${geist.variable} ${geistMono.variable} ${cormorant.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}
         </AuthProvider>
