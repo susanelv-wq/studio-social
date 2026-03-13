@@ -1,62 +1,40 @@
-import { Project, AppState } from './types'
+import { Project } from './types'
 import { createClient } from './supabase/client'
 
-const CLIENT_ID_KEY = 'supabase-client-id'
-
-function getAnonymousId(): string {
-  if (typeof window === 'undefined') return ''
-  try {
-    let id = localStorage.getItem(CLIENT_ID_KEY)
-    if (!id) {
-      id = crypto.randomUUID()
-      localStorage.setItem(CLIENT_ID_KEY, id)
-    }
-    return id
-  } catch {
-    return ''
-  }
-}
-
-/** When signed in: use user id so projects are per-user. When signed out: use anonymous id (per device). */
-async function getStorageId(): Promise<string> {
+/**
+ * Load projects from Supabase for the given user id (must be signed-in user).
+ * Call only when userId is non-null; otherwise use localStorage in storage.ts.
+ */
+export async function loadProjects(userId: string): Promise<Project[]> {
   const supabase = createClient()
-  if (!supabase) return getAnonymousId()
-  const { data: { session } } = await supabase.auth.getSession()
-  return session?.user?.id ?? getAnonymousId()
-}
-
-export async function loadProjects(): Promise<Project[]> {
-  const supabase = createClient()
-  if (!supabase) return []
-
-  const clientId = await getStorageId()
-  if (!clientId) return []
+  if (!supabase || !userId) return []
 
   const { data, error } = await supabase
     .from('projects')
     .select('data')
-    .eq('client_id', clientId)
+    .eq('client_id', userId)
     .order('updated_at', { ascending: false })
 
   if (error) {
     const msg = error?.message ?? (error as { code?: string })?.code ?? JSON.stringify(error)
-    console.warn('Supabase loadProjects failed (using localStorage fallback):', msg)
+    console.warn('Supabase loadProjects failed:', msg)
     throw error
   }
 
   return (data ?? []).map((row) => row.data as Project)
 }
 
-export async function saveProjects(projects: Project[]): Promise<void> {
+/**
+ * Save projects to Supabase for the given user id (must be signed-in user).
+ * Call only when userId is non-null; otherwise use localStorage in storage.ts.
+ */
+export async function saveProjects(projects: Project[], userId: string): Promise<void> {
   const supabase = createClient()
-  if (!supabase) return
-
-  const clientId = await getStorageId()
-  if (!clientId) return
+  if (!supabase || !userId) return
 
   const rows = projects.map((p) => ({
     id: p.id,
-    client_id: clientId,
+    client_id: userId,
     name: p.name,
     data: p,
     created_at: p.createdAt,
@@ -70,7 +48,7 @@ export async function saveProjects(projects: Project[]): Promise<void> {
 
   if (error) {
     const msg = error?.message ?? (error as { code?: string })?.code ?? JSON.stringify(error)
-    console.warn('Supabase saveProjects failed (using localStorage fallback):', msg)
+    console.warn('Supabase saveProjects failed:', msg)
     throw error
   }
 }

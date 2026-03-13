@@ -3,7 +3,11 @@ import { isSupabaseConfigured } from './supabase/client'
 import * as supabaseStorage from './supabase-storage'
 
 const STORAGE_KEY = 'social-mockup-studio'
-const CURRENT_PROJECT_KEY = 'current-project-id'
+
+function currentProjectKey(userId: string | null): string {
+  if (typeof window === 'undefined') return 'current-project-id'
+  return userId ? `current-project-id-${userId}` : 'current-project-id'
+}
 
 function saveProjectsLocal(projects: Project[]): void {
   if (typeof window !== 'undefined') {
@@ -26,11 +30,11 @@ function loadProjectsLocal(): Project[] {
   }
 }
 
-/** Persist projects to Supabase (if configured) or localStorage. Falls back to localStorage if Supabase fails. */
-export async function saveProjects(projects: Project[]): Promise<void> {
-  if (isSupabaseConfigured()) {
+/** Persist projects. When userId is set and Supabase configured, save to Supabase (per-user). Else localStorage. */
+export async function saveProjects(projects: Project[], userId: string | null): Promise<void> {
+  if (isSupabaseConfigured() && userId) {
     try {
-      await supabaseStorage.saveProjects(projects)
+      await supabaseStorage.saveProjects(projects, userId)
     } catch {
       saveProjectsLocal(projects)
     }
@@ -39,11 +43,11 @@ export async function saveProjects(projects: Project[]): Promise<void> {
   }
 }
 
-/** Load projects from Supabase (if configured) or localStorage. Falls back to localStorage if Supabase fails (e.g. table not created). */
-export async function loadProjects(): Promise<Project[]> {
-  if (isSupabaseConfigured()) {
+/** Load projects. When userId is set and Supabase configured, load from Supabase (per-user). Else localStorage. */
+export async function loadProjects(userId: string | null): Promise<Project[]> {
+  if (isSupabaseConfigured() && userId) {
     try {
-      return await supabaseStorage.loadProjects()
+      return await supabaseStorage.loadProjects(userId)
     } catch {
       return loadProjectsLocal()
     }
@@ -51,21 +55,20 @@ export async function loadProjects(): Promise<Project[]> {
   return loadProjectsLocal()
 }
 
-export function saveCurrentProjectId(projectId: string): void {
+export function saveCurrentProjectId(projectId: string, userId: string | null): void {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(CURRENT_PROJECT_KEY, projectId)
+      localStorage.setItem(currentProjectKey(userId), projectId)
     } catch (error) {
       console.error('Failed to save current project ID:', error)
     }
   }
 }
 
-export function loadCurrentProjectId(): string {
+export function loadCurrentProjectId(userId: string | null): string {
   if (typeof window === 'undefined') return ''
-
   try {
-    return localStorage.getItem(CURRENT_PROJECT_KEY) || ''
+    return localStorage.getItem(currentProjectKey(userId)) || ''
   } catch (error) {
     console.error('Failed to load current project ID:', error)
     return ''
@@ -93,26 +96,27 @@ export function createDefaultProject(name: string): Project {
   }
 }
 
-/** Load initial app state from Supabase or localStorage. */
-export async function getInitialState(): Promise<AppState> {
-  const projects = await loadProjects()
-  const currentProjectId = loadCurrentProjectId()
+/**
+ * Load initial app state for the given user.
+ * userId: signed-in user id, or null for anonymous (localStorage only).
+ */
+export async function getInitialState(userId: string | null): Promise<AppState> {
+  const projects = await loadProjects(userId)
+  const storedCurrentId = loadCurrentProjectId(userId)
 
-  // If no projects exist, create a default one
   if (projects.length === 0) {
     const defaultProject = createDefaultProject('My First Project')
     const newProjects = [defaultProject]
-    await saveProjects(newProjects)
-    saveCurrentProjectId(defaultProject.id)
+    await saveProjects(newProjects, userId)
+    saveCurrentProjectId(defaultProject.id, userId)
     return {
       projects: newProjects,
       currentProjectId: defaultProject.id
     }
   }
 
-  // If current project ID is invalid, use the first project
-  const validProjectId = projects.some(p => p.id === currentProjectId)
-    ? currentProjectId
+  const validProjectId = projects.some(p => p.id === storedCurrentId)
+    ? storedCurrentId
     : projects[0].id
 
   return {

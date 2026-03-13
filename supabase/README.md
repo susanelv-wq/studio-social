@@ -10,11 +10,12 @@
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-4. Run the migration in the Supabase **SQL Editor**:
-   - Paste and run the contents of `migrations/20250305000000_create_projects.sql`.
+4. Run the migrations in the Supabase **SQL Editor** (in order):
+   - `migrations/20250305000000_create_projects.sql` — creates the `projects` table.
+   - `migrations/20250305100000_projects_rls.sql` — enables RLS so each user only sees their own projects.
 
 5. Run `npm install` (or `pnpm install`) so `@supabase/supabase-js` is installed.
 
 6. **Redirect URL for password reset:** In **Authentication** → **URL Configuration** → **Redirect URLs**, add your app URL plus `/auth/reset-password`, e.g. `https://yoursite.com/auth/reset-password` and `http://localhost:3000/auth/reset-password` for local dev.
 
-With these in place, projects are stored in Supabase and users can **Sign in / Sign up / Log out / Forgot password**. Projects are saved per user when signed in. Without env vars, the app uses localStorage only and no auth UI.
+With these in place, **signed-in** users get projects stored in Supabase (per user; other users cannot see them). **Signed-out** users use localStorage only on this device. You can **Sign in / Sign up / Log out / Forgot password**. Without env vars, the app uses localStorage only and no auth UI.
