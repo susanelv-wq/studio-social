@@ -2,7 +2,9 @@
 
 1. Create a project at [supabase.com](https://supabase.com) and get your project URL and anon key from **Settings → API**.
 
-2. **Enable Email auth:** In the dashboard go to **Authentication** → **Providers** → enable **Email**. (Users sign up with email + password; optional: enable "Confirm email" in Email provider settings.)
+2. **Enable Email auth:** In the dashboard go to **Authentication** → **Providers** → enable **Email**. (Optional: enable "Confirm email" so new users get a confirmation email.)
+
+   **To actually deliver sign-up and forgot-password emails to users**, configure **Custom SMTP** in **Project Settings** → **Authentication** → **SMTP Settings**. See [EMAIL-SETUP.md](../EMAIL-SETUP.md) in the project root for step-by-step instructions.
 
 3. Copy `.env.local.example` to `.env.local` and set:
    - `NEXT_PUBLIC_SUPABASE_URL`

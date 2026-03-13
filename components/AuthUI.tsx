@@ -50,10 +50,19 @@ export default function AuthUI() {
         ? await signIn(email, password)
         : await signUp(email, password)
       if (err) {
-        setError(err.message)
+        const msg = err.message || String(err)
+        setError(
+          msg.toLowerCase().includes('confirmation') || msg.toLowerCase().includes('sending')
+            ? 'Sign-up email could not be sent. In Supabase enable Custom SMTP (Project Settings → Authentication → SMTP). See EMAIL-SETUP.md.'
+            : msg
+        )
         return
       }
-      setOpen(false)
+      if (mode === 'signup') {
+        setSuccess('Account created. If your project requires email confirmation, check your inbox for the confirmation link.')
+      } else {
+        setOpen(false)
+      }
       setEmail('')
       setPassword('')
     } finally {
