@@ -63,18 +63,22 @@ export default function Home() {
 
   if (authLoading || !isLoaded || !currentProject) {
     return (
-      <div className="flex items-center justify-center w-full h-screen bg-background">
-        <p className="text-foreground">Loading...</p>
+      <div className="flex flex-col items-center justify-center w-full h-screen bg-background gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading your projects...</p>
       </div>
     )
   }
 
   return (
     <main className="flex flex-col w-full h-screen bg-background">
-      <header className="flex items-center justify-end gap-2 px-4 py-2 border-b border-border bg-card shrink-0">
+      <header className="flex items-center justify-between gap-4 px-5 py-3 border-b border-border bg-card shrink-0 shadow-sm">
+        <div className="flex items-center gap-2 text-primary font-bold tracking-tight">
+          <span className="text-xl">SS</span>
+        </div>
         <AuthUI />
       </header>
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         <ProjectSidebar
           projects={projects}
           currentProjectId={currentProjectId}

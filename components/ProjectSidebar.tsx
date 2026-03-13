@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus, MoreVertical, Trash2, Edit2 } from 'lucide-react'
+import { Plus, MoreVertical, Trash2, Edit2, Check, X } from 'lucide-react'
 
 interface ProjectSidebarProps {
   projects: Project[]
@@ -60,19 +60,24 @@ export default function ProjectSidebar({
     setEditingName(project.name)
   }
 
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditingName('')
+  }
+
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col">
+    <aside className="w-64 shrink-0 border-r border-border bg-card flex flex-col shadow-sm">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <h1 className="text-lg font-bold text-foreground mb-4">Social Studio</h1>
-        <Button onClick={handleCreateProject} className="w-full gap-2" size="sm">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Projects</p>
+        <Button onClick={handleCreateProject} className="w-full gap-2 rounded-lg h-10 font-medium shadow-sm" size="sm">
           <Plus className="w-4 h-4" />
-          New Project
+          New project
         </Button>
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-3 min-h-0">
         {projects.length === 0 ? (
           <div className="text-sm text-muted-foreground text-center py-8">
             No projects yet. Create one to get started.
@@ -82,61 +87,85 @@ export default function ProjectSidebar({
             {projects.map(project => (
               <div
                 key={project.id}
-                className={`group relative flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
-                  currentProjectId === project.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent'
+                className={`group relative flex items-center gap-2 p-2.5 rounded-xl transition-colors ${
+                  editingId === project.id
+                    ? 'bg-accent cursor-default ring-1 ring-primary/20'
+                    : currentProjectId === project.id
+                      ? 'bg-primary text-primary-foreground cursor-pointer shadow-sm'
+                      : 'hover:bg-accent cursor-pointer'
                 }`}
-                onClick={() => onProjectSelect(project.id)}
+                onClick={() => editingId !== project.id && onProjectSelect(project.id)}
               >
                 {editingId === project.id ? (
-                  <input
-                    autoFocus
-                    className="flex-1 bg-transparent outline-none text-sm"
-                    value={editingName}
-                    onChange={e => setEditingName(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        handleRenameProject(project.id, editingName)
-                      } else if (e.key === 'Escape') {
-                        setEditingId(null)
-                      }
-                    }}
-                    onClick={e => e.stopPropagation()}
-                  />
+                  <div className="flex-1 min-w-0 flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                    <Input
+                      autoFocus
+                      value={editingName}
+                      onChange={e => setEditingName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') handleRenameProject(project.id, editingName)
+                        else if (e.key === 'Escape') handleCancelEdit()
+                      }}
+                      className="h-8 flex-1 min-w-0 text-sm bg-background border-input rounded-lg"
+                      placeholder="Project name"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 text-foreground hover:bg-background/20"
+                      onClick={() => handleRenameProject(project.id, editingName)}
+                      disabled={!editingName.trim()}
+                      title="Save"
+                    >
+                      <Check className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 text-foreground hover:bg-background/20"
+                      onClick={handleCancelEdit}
+                      title="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 ) : (
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{project.name}</p>
                   </div>
                 )}
 
-                {/* Action Menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={e => {
-                      e.stopPropagation()
-                      handleStartEdit(project)
-                    }} className="gap-2">
-                      <Edit2 className="w-4 h-4" />
-                      Rename
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
+                {/* Action Menu (only when not editing) */}
+                {editingId !== project.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+                      <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-black/10">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={e => {
                         e.stopPropagation()
-                        handleDeleteProject(project.id)
-                      }}
-                      className="gap-2 text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                        handleStartEdit(project)
+                      }} className="gap-2">
+                        <Edit2 className="w-4 h-4" />
+                        Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={e => {
+                          e.stopPropagation()
+                          handleDeleteProject(project.id)
+                        }}
+                        className="gap-2 text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             ))}
           </div>
@@ -144,7 +173,7 @@ export default function ProjectSidebar({
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border text-xs text-muted-foreground">
+      <div className="p-4 border-t border-border text-xs text-muted-foreground bg-muted/30">
         <p>{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
       </div>
     </aside>

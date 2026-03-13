@@ -61,11 +61,11 @@ export default function AuthLanding() {
 
   if (!isSupabaseConfigured()) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-        <div className="w-full max-w-sm text-center space-y-6">
-          <h1 className="text-2xl font-bold text-foreground">Social Studio</h1>
-          <p className="text-muted-foreground">Projects are saved on this device only. Sign in is not configured.</p>
-          <Button asChild className="w-full" size="lg">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50 p-6">
+        <div className="w-full max-w-sm text-center space-y-6 rounded-2xl bg-card p-8 shadow-lg border border-border">
+          <h1 className="text-2xl font-bold text-primary">SS</h1>
+          <p className="text-muted-foreground text-sm">Projects are saved on this device only. Sign in is not configured.</p>
+          <Button asChild className="w-full rounded-xl h-11 font-medium shadow-sm" size="lg">
             <a href="/">Continue to app</a>
           </Button>
         </div>
@@ -74,20 +74,20 @@ export default function AuthLanding() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-      <div className="w-full max-w-sm space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50 p-6">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground">Social Studio</h1>
-          <p className="text-sm text-muted-foreground mt-1">Plan feeds, reels & stories</p>
+          <h1 className="text-3xl font-bold text-primary tracking-tight">SS</h1>
+          <p className="text-muted-foreground mt-2">Plan feeds, reels & stories in one place</p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex gap-2 mb-6">
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-xl shadow-primary/5">
+          <div className="flex gap-2 mb-6 rounded-xl bg-muted/50 p-1">
             <Button
               type="button"
-              variant={mode === 'signin' ? 'default' : 'outline'}
+              variant={mode === 'signin' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1 gap-1"
+              className="flex-1 gap-1.5 rounded-lg font-medium h-9"
               onClick={() => { setMode('signin'); setError(null); setSuccess(null); }}
             >
               <LogIn className="w-4 h-4" />
@@ -95,9 +95,9 @@ export default function AuthLanding() {
             </Button>
             <Button
               type="button"
-              variant={mode === 'signup' ? 'default' : 'outline'}
+              variant={mode === 'signup' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1 gap-1"
+              className="flex-1 gap-1.5 rounded-lg font-medium h-9"
               onClick={() => { setMode('signup'); setError(null); setSuccess(null); }}
             >
               <UserPlus className="w-4 h-4" />
@@ -107,19 +107,19 @@ export default function AuthLanding() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-foreground block mb-1">Email</label>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Email</label>
               <Input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="bg-input"
+                className="bg-input rounded-xl border-border h-11"
               />
             </div>
             {mode !== 'forgot' && (
               <div>
-                <label className="text-sm font-medium text-foreground block mb-1">Password</label>
+                <label className="text-sm font-medium text-foreground block mb-1.5">Password</label>
                 <Input
                   type="password"
                   value={password}
@@ -127,7 +127,7 @@ export default function AuthLanding() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="bg-input"
+                  className="bg-input rounded-xl border-border h-11"
                 />
                 {mode === 'signin' && (
                   <button
@@ -144,14 +144,14 @@ export default function AuthLanding() {
               <p className="text-sm text-destructive">{error}</p>
             )}
             {success && (
-              <p className="text-sm text-green-600 dark:text-green-400">{success}</p>
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">{success}</p>
             )}
             <div className="flex gap-2 pt-2">
               {mode === 'forgot' && (
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 rounded-xl h-11 font-medium"
                   onClick={() => { setMode('signin'); setSuccess(null); }}
                 >
                   Back
@@ -159,7 +159,7 @@ export default function AuthLanding() {
               )}
               <Button
                 type="submit"
-                className={mode === 'forgot' ? 'flex-1' : 'w-full'}
+                className={`${mode === 'forgot' ? 'flex-1' : 'w-full'} rounded-xl h-11 font-medium shadow-sm`}
                 disabled={busy}
               >
                 {busy ? '…' : mode === 'forgot' ? 'Send reset link' : mode === 'signin' ? 'Sign in' : 'Sign up'}

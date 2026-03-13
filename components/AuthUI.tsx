@@ -84,11 +84,11 @@ export default function AuthUI() {
 
   if (user) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground truncate max-w-[140px]" title={user.email}>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-muted-foreground truncate max-w-[160px]" title={user.email}>
           {user.email}
         </span>
-        <Button variant="ghost" size="sm" onClick={() => signOut()} className="gap-1">
+        <Button variant="outline" size="sm" onClick={() => signOut()} className="gap-1.5 rounded-lg font-medium">
           <LogOut className="w-4 h-4" />
           Log out
         </Button>
@@ -98,18 +98,18 @@ export default function AuthUI() {
 
   return (
     <>
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" onClick={() => { setMode('signin'); setError(null); setOpen(true); }} className="gap-1">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={() => { setMode('signin'); setError(null); setOpen(true); }} className="gap-1.5 rounded-lg font-medium text-foreground">
           <LogIn className="w-4 h-4" />
           Sign in
         </Button>
-        <Button variant="outline" size="sm" onClick={() => { setMode('signup'); setError(null); setOpen(true); }} className="gap-1">
+        <Button variant="default" size="sm" onClick={() => { setMode('signup'); setError(null); setOpen(true); }} className="gap-1.5 rounded-lg font-medium shadow-sm">
           <UserPlus className="w-4 h-4" />
           Sign up
         </Button>
       </div>
       <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setMode('signin'); setSuccess(null); setError(null); }}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl shadow-xl">
           <DialogHeader>
             <DialogTitle>
               {mode === 'forgot' ? 'Reset password' : mode === 'signin' ? 'Sign in' : 'Create account'}
@@ -131,7 +131,7 @@ export default function AuthUI() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="bg-input"
+                className="bg-input rounded-xl h-10"
               />
             </div>
             {mode !== 'forgot' && (
@@ -144,7 +144,7 @@ export default function AuthUI() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="bg-input"
+                  className="bg-input rounded-xl h-10"
                 />
                 {mode === 'signin' && (
                   <button
@@ -163,16 +163,16 @@ export default function AuthUI() {
             {success && (
               <p className="text-sm text-green-600 dark:text-green-400">{success}</p>
             )}
-            <DialogFooter>
+            <DialogFooter className="gap-2">
               {mode === 'forgot' && (
-                <Button type="button" variant="ghost" onClick={() => { setMode('signin'); setSuccess(null); }}>
+                <Button type="button" variant="ghost" onClick={() => { setMode('signin'); setSuccess(null); }} className="rounded-xl">
                   Back to sign in
                 </Button>
               )}
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="rounded-xl">
                 Cancel
               </Button>
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" disabled={busy} className="rounded-xl shadow-sm">
                 {busy ? '…' : mode === 'forgot' ? 'Send reset link' : mode === 'signin' ? 'Sign in' : 'Sign up'}
               </Button>
             </DialogFooter>

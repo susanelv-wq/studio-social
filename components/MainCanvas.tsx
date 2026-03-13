@@ -78,30 +78,30 @@ export default function MainCanvas({ project, onProjectChange }: MainCanvasProps
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Top Bar */}
-      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
+    <div className="flex-1 flex flex-col overflow-hidden bg-muted/20">
+      {/* Top Bar - Canva-style */}
+      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-foreground">{project.name}</h2>
-          <p className="text-sm text-muted-foreground">
-            {project.brandSettings.name} • {project.feedItems.length} posts
+          <h2 className="text-lg font-semibold text-foreground">{project.name}</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {project.brandSettings.name} · {project.feedItems.length} posts
           </p>
         </div>
-        <div className="flex gap-2">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={showDeviceFrame}
               onChange={e => setShowDeviceFrame(e.target.checked)}
-              className="rounded"
+              className="rounded border-border text-primary focus:ring-primary"
             />
-            Device Frame
+            Device frame
           </label>
           <button
             onClick={() => setShowBrandSettings(!showBrandSettings)}
-            className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity"
+            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity shadow-sm"
           >
-            {showBrandSettings ? 'Hide' : 'Brand Settings'}
+            {showBrandSettings ? 'Hide brand' : 'Brand settings'}
           </button>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function MainCanvas({ project, onProjectChange }: MainCanvasProps
       <div className="flex-1 flex overflow-hidden gap-4 p-6">
         {/* Brand Settings Panel */}
         {showBrandSettings && (
-          <div className="w-80 overflow-y-auto border border-border rounded-lg">
+          <div className="w-80 shrink-0 overflow-y-auto border border-border rounded-2xl bg-card shadow-sm">
             <BrandSettingsPanel
               project={project}
               onProjectChange={onProjectChange}
@@ -118,20 +118,20 @@ export default function MainCanvas({ project, onProjectChange }: MainCanvasProps
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Tabs - Canva-style underline */}
+        <div className="flex-1 overflow-hidden flex flex-col min-w-0">
           <Tabs defaultValue="feed" className="flex flex-col h-full">
-            <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto">
-              <TabsTrigger value="feed" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+            <TabsList className="w-full justify-start border-b border-border rounded-none bg-transparent p-0 h-auto gap-0">
+              <TabsTrigger value="feed" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-medium px-4 py-2.5">
                 Feed
               </TabsTrigger>
-              <TabsTrigger value="reels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+              <TabsTrigger value="reels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-medium px-4 py-2.5">
                 Reels
               </TabsTrigger>
-              <TabsTrigger value="stories" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+              <TabsTrigger value="stories" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-medium px-4 py-2.5">
                 Stories
               </TabsTrigger>
-              <TabsTrigger value="tasks" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+              <TabsTrigger value="tasks" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-medium px-4 py-2.5">
                 Tasks
               </TabsTrigger>
             </TabsList>
