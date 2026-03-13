@@ -74,7 +74,7 @@ export default function Home() {
     <main className="flex flex-col w-full h-screen bg-background">
       <header className="flex items-center justify-between gap-4 px-5 py-3 border-b border-border bg-card shrink-0 shadow-sm">
         <div className="flex items-center gap-2 text-primary font-bold tracking-tight [font-family:var(--font-display),'Cormorant_Garamond',Georgia,serif]">
-          <span className="text-xl">SS</span>
+          <span className="text-xl">Studio Social</span>
         </div>
         <AuthUI />
       </header>

@@ -63,7 +63,7 @@ export default function AuthLanding() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50 p-6">
         <div className="w-full max-w-sm text-center space-y-6 rounded-2xl bg-card p-8 shadow-lg border border-border">
-          <h1 className="text-2xl font-bold text-primary tracking-tight">SS</h1>
+          <h1 className="text-2xl font-bold text-primary tracking-tight">Studio Social</h1>
           <p className="text-muted-foreground text-sm">Projects are saved on this device only. Sign in is not configured.</p>
           <Button asChild className="w-full rounded-xl h-11 font-medium shadow-sm" size="lg">
             <a href="/">Continue to app</a>
@@ -77,7 +77,7 @@ export default function AuthLanding() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50 p-6">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary tracking-tight">SS</h1>
+          <h1 className="text-3xl font-bold text-primary tracking-tight">Studio Social</h1>
           <p className="text-muted-foreground mt-2 text-[15px]">Plan feeds, reels & stories in one place</p>
         </div>
 
